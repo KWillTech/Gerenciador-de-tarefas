@@ -3,12 +3,15 @@ from tkinter import ttk, messagebox
 from pymongo import MongoClient
 from bson.objectid import ObjectId
 import pandas as pd
-from interface.funcoes import adicionar_despesa
+import interface.funcoes 
 
+# Conexao com o banco de dados MongoDB
 
 cliente = MongoClient('mongodb://localhost:27017/')
 banco = cliente['cadastrodb']
 colecao = banco['despesas']
+
+# Interface grafica
 
 janela = tk.Tk()
 janela.title("Cadastro de Despesas")
@@ -24,6 +27,8 @@ lbl_titulo = tk.Label(frame_topo,
                       fg="white",
                       font=("Arial", 16, "bold"))
 lbl_titulo.pack(pady=10)
+
+# Caixa de entrada de dados
 
 frame_dados = tk.Frame(janela,
                        padx= 20,
@@ -53,15 +58,63 @@ tk.Label(frame_dados,
 entrada_valor = tk.Entry(frame_dados, font=("Arial", 12))
 entrada_valor.grid(row=3, column=1, padx=10, pady=5)
 
+
+# Botoes de ação
+
 frame_botoes = tk.Frame(janela, pady=10)
 frame_botoes.pack(fill="x")
+
 btn_adicionar = tk.Button(frame_botoes,
                           text="Adicionar",
-                          command=adicionar_despesa,
+                          command=interface.funcoes.adicionar_despesa,
                           bg="#2a9d8f",
                           fg="white",
                           font=("Arial", 12, "bold"), width=10)
 btn_adicionar.pack(side="left", padx=10)
+
+
+btn_alterar = tk.Button(frame_botoes,
+                        text="Alterar",
+                        command=interface.funcoes.alterar_despesa,
+                        bg="#f4a261",
+                        fg="white",
+                        font=("Arial", 12, "bold"), width=10)
+btn_alterar.pack(side="left", padx=10)
+
+
+btn_excluir = tk.Button(frame_botoes,
+                        text="Excluir",
+                        command=interface.funcoes.excluir_despesa,
+                        bg="#e76f51",
+                        fg="white",
+                        font=("Arial", 12, "bold"), width=10)
+btn_excluir.pack(side="left", padx=10)
+
+
+btn_filtrar = tk.Button(frame_botoes,
+                        text="Filtrar",
+                        command=interface.funcoes.filtrar_despesas,
+                        bg="#2a9d8f",
+                        fg="white",
+                        font=("Arial", 12, "bold"), width=10)
+btn_filtrar.pack(side="left", padx=10)
+
+
+btn_exportar = tk.Button(frame_botoes,
+                        text="Exportar para Excel",
+                        command=interface.funcoes.exportar_despesas,
+                        bg="#2a9d8f",
+                        fg="white",
+                        font=("Arial", 12, "bold"), width=20)
+btn_exportar.pack(side="left", padx=10)
+
+
+lbl_total = tk.Label(janela,
+                      text="Total de despesas: R$ 0,00",
+                      font=("Arial", 12, "bold"),
+                      bg="#f0f0f0")
+lbl_total.pack(pady=10)
+
 
 
 janela.mainloop()
