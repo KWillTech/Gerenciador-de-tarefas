@@ -1,2 +1,2 @@
-# Gerenciador de tarefas
-Adicionar, remover, alterar e consultar.
+# Cadastro de despesas
+Adicionar, remover, alterar, consultar e exportar.
