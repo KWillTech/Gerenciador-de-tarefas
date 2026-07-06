@@ -15,3 +15,9 @@ def filtrar_despesas():
 
 def exportar_despesas():
     messagebox.showinfo("Exportar", "Função exportar ainda não implementada.")
+
+def selecionar_item(event):
+    messagebox.showinfo("Selecionar", "Função selecionar item ainda não implementada.")
+
+def carregar_dados():
+    messagebox.showinfo("Carregar", "Função carregar dados ainda não implementada.")

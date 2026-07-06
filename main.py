@@ -115,6 +115,39 @@ lbl_total = tk.Label(janela,
                       bg="#f0f0f0")
 lbl_total.pack(pady=10)
 
+# Lista de despesas
+
+frame_lista = tk.Frame(janela, pady=20)
+frame_lista.pack(fill="both", expand=True)
+
+estilo = ttk.Style()
+estilo.configure("Treeview", font=("Arial", 12))
+estilo.configure("Treeview.Heading", font=("Arial", 12, "bold"))
+tree = ttk.Treeview(frame_lista, 
+                    columns=("ID","Data", "Categoria", "Descrição", "Valor"), 
+                    show="headings",
+                    style="Treeview")
+
+scrollbar = tk.Scrollbar(frame_lista, orient="vertical", command=tree.yview)
+tree.configure(yscrollcommand=scrollbar.set)
+scrollbar.pack(side="right", fill="y")
+tree.pack(fill="both", expand=True)
+
+# Configuracao das colunas da Treeview
+tree.heading("ID", text="ID")
+tree.heading("Data", text="Data")
+tree.heading("Categoria", text="Categoria")
+tree.heading("Descrição", text="Descrição")
+tree.heading("Valor", text="Valor")
+
+tree.column("ID", width=50, anchor="center")
+tree.column("Data", width=50, anchor="center")
+tree.column("Categoria", width=100, anchor="w")
+tree.column("Descrição", width=200, anchor="center")
+tree.column("Valor", width=50, anchor="w")
+
+tree.bind("<ButtonRelease-1>", interface.funcoes.selecionar_item)
+interface.funcoes.carregar_dados()
 
 
 janela.mainloop()
