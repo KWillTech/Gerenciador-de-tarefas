@@ -5,6 +5,15 @@ from bson.objectid import ObjectId
 import pandas as pd
 import interface.funcoes 
 
+# Função intermediaria para ações
+def adicionar():
+    interface.funcoes.adicionar_despesa(
+                                         entrada_categoria,
+                                         entrada_descricao,
+                                         entrada_valor,
+                                         colecao)
+        
+
 # Conexao com o banco de dados MongoDB
 
 cliente = MongoClient('mongodb://localhost:27017/')
@@ -34,11 +43,7 @@ frame_dados = tk.Frame(janela,
                        padx= 20,
                        pady= 10)
 frame_dados.pack(fill="x")
-tk.Label(frame_dados,
-         text="Data:",
-         font=("Arial", 12)).grid(row=0, column=0, sticky="e")
-entrada_data = tk.Entry(frame_dados, font=("Arial", 12))
-entrada_data.grid(row=0, column=1, padx=10, pady=5)
+
 
 tk.Label(frame_dados,
          text="Categoria:",
@@ -66,7 +71,7 @@ frame_botoes.pack(fill="x")
 
 btn_adicionar = tk.Button(frame_botoes,
                           text="Adicionar",
-                          command=interface.funcoes.adicionar_despesa,
+                          command=adicionar,
                           bg="#2a9d8f",
                           fg="white",
                           font=("Arial", 12, "bold"), width=10)
@@ -124,7 +129,7 @@ estilo = ttk.Style()
 estilo.configure("Treeview", font=("Arial", 12))
 estilo.configure("Treeview.Heading", font=("Arial", 12, "bold"))
 tree = ttk.Treeview(frame_lista, 
-                    columns=("ID","Data", "Categoria", "Descrição", "Valor"), 
+                    columns=("ID", "Categoria", "Descrição", "Valor"), 
                     show="headings",
                     style="Treeview")
 
@@ -135,13 +140,11 @@ tree.pack(fill="both", expand=True)
 
 # Configuracao das colunas da Treeview
 tree.heading("ID", text="ID")
-tree.heading("Data", text="Data")
 tree.heading("Categoria", text="Categoria")
 tree.heading("Descrição", text="Descrição")
 tree.heading("Valor", text="Valor")
 
 tree.column("ID", width=50, anchor="center")
-tree.column("Data", width=50, anchor="center")
 tree.column("Categoria", width=100, anchor="w")
 tree.column("Descrição", width=200, anchor="center")
 tree.column("Valor", width=50, anchor="w")
