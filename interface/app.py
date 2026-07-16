@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 from tkinter import filedialog
 from bson import ObjectId
-from banco.conexao import colecao
+from banco.conexao import despesas
 import pandas as pd
 from datetime import datetime
 
@@ -11,7 +11,7 @@ class App():
     def __init__(self):
 
         # --- Banco de dados ---
-        self.colecao = colecao
+        self.colecao = despesas
         self.id_selecionado = None
         self.colecao.find().sort("data", -1)  # Ordena por data decrescente
 
@@ -162,7 +162,7 @@ class App():
 
     def excluir_despesa(self):
         if not self.id_selecionado:
-            messagebox.showerror("Erro", "Selecione uma despesa.")
+            messagebox.showwarning("Erro", "Selecione uma despesa.")
             return
         if messagebox.askyesno("Confirmação", "Tem certeza que deseja excluir esta despesa?"):
             self.colecao.delete_one({"_id": ObjectId(self.id_selecionado)})
@@ -179,17 +179,18 @@ class App():
                     {"descricao": {"$regex": termo, "$options": "i"}},
                     {"categoria": {"$regex": termo, "$options": "i"}}]}
         self.carregar_dados(filtro)
+        
 
 
     def exportar_para_excel(self):
         dados = list(self.colecao.find())
         if not dados:
-            messagebox.showinfo("Exportar para Excel", "Não há despesas para exportar.")
+            messagebox.showerror("Exportar", "Não há despesas para exportar")
             return
         for d in dados:
             d["_id"] = str(d["_id"])
         caminho = filedialog.asksaveasfilename(defaultextension=".xlsx",
-                                                filetypes=[("Excel files", "*.xlsx"), ("CSV files", "*.csv")])
+                                               filetypes=[("Excel files", "*xlsx"), ("CSV files", "*csv")])
         if not caminho:
             return
         df = pd.DataFrame(dados)
@@ -197,41 +198,43 @@ class App():
             df.to_csv(caminho, index=False)
         else:
             df.to_excel(caminho, index=False)
-        messagebox.showinfo("Exportar para Excel", f"Despesas exportadas com sucesso para {caminho}.")
+        messagebox.showinfo("Exportar", f"Despesas exportadas com sucesso para {caminho}!")
 
 
     def limpar_filtros(self):
-        self.ent_descricao.delete(0, "end")
-        self.ent_categoria.set("")
-        self.ent_valor.delete(0, "end")
-        self.ent_data.delete(0, "end")
-        self.carregar_dados()
-        messagebox.showinfo("Limpar Filtros", "Filtros limpos com sucesso.")
+       self.ent_descricao.delete(0, "end")
+       self.ent_categoria.set("")
+       self.ent_valor.delete(0, "end")
+       self.ent_data.delete(0, "end")
+       self.carregar_dados()
+       messagebox.showinfo("Limpar Filtro", "Filtros limpos com sucesso.") 
+
 
     # --- Suporte ---
     def carregar_dados(self, filtro=None):
         for i in self.treeview.get_children():
-          self.treeview.delete(i)
-
+            self.treeview.delete(i)
+        
         docs = list(self.colecao.find(filtro or {}))
 
         def parse_data(d):
             data_str = d.get("data", "")
             try:
-                return datetime.strptime(data_str, "%d/%m/%Y")
+                return datetime.strftime(data_str, "%d/%m/%Y")
             except (ValueError, TypeError):
                 return datetime.min
-
-        docs.sort(key=parse_data, reverse=True)  # mais recente primeiro
+            
+        docs.sort(key=parse_data, reverse=True) # Mais recente primeiro
 
         for d in docs:
             self.treeview.insert("", "end", values=(
-                str(d["_id"]),
-                d.get("descricao", ""),
-                d.get("categoria", ""),
-                f'{d.get("valor", 0):.2f}',
-                d.get("data", "")
-            ))
+                                 str(d["_id"]),
+                                 d.get("descricao", ""),
+                                 d.get("categoria", ""),
+                                 f'{d.get("valor", 0):.2f}',
+                                 d.get("data", "")))
+            
+
 
 
     def selecionar_despesa(self, event=None):
@@ -244,14 +247,16 @@ class App():
         self.limpar_campos(reset_id=False)
         self.ent_descricao.insert(0, valores[1])
         self.ent_categoria.set(valores[2])
-        self.ent_valor.insert(0, valores[3].replace("R$ ", ""))
+        self.ent_valor.insert(0, valores[3].replace("R$", "."))
         self.ent_data.insert(0, valores[4])
+
         
 
     def limpar_campos(self, reset_id=True):
         self.ent_descricao.delete(0, "end")
         self.ent_categoria.set("")
-        self.ent_valor.delete(0, "end")
         self.ent_data.delete(0, "end")
+        self.ent_valor.delete(0, "end")
         if reset_id:
             self.id_selecionado = None
+
