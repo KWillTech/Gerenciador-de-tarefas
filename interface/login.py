@@ -23,8 +23,8 @@ class Login:
 
         # --- Criar usuario padrao ---
         if self.usuarios.count_documents({}) == 0:
-            self.usuarios.insert_one({"usuario": "Admin",
-                                      "senha": hash_senha("Admin")})
+            self.usuarios.insert_one({"usuario": "admin",
+                                      "senha": hash_senha("admin")})
 
         # --- Janela ---
         self.janela = tk.Tk()
@@ -65,4 +65,60 @@ class Login:
         self.ent_senha = tk.Entry(form, width=28, show="*", font=self.fonte)
         self.ent_senha.grid(row=3, column=0, pady=5)
 
+        # --- Enter dispara login ---
+        self.ent_senha.bind("<Return>", lambda e: self.autenticar())
+
+        # --- Botoes ---
+        btns = tk.Frame(self.janela, bg=self.cor_sec)
+        btns.pack(pady=10)
+
+        tk.Button(btns, text="Entrar",
+                  width=12,
+                  bg=self.cor_pri,
+                  fg=self.cor_texto,
+                  command=self.autenticar).grid(row=0, column=0, padx=5)
+        
+        tk.Button(btns, text="Cadastrar",
+                  width=12,
+                  bg=self.cor_pri,
+                  fg=self.cor_texto,
+                  command=self.cadastrar).grid(row=0, column=1, padx=5)
+
         self.ent_usuario.focus()
+
+    def autenticar(self):
+        usuario = self.ent_usuario.get().strip()
+        senha = self.ent_senha.get().strip()
+
+        if not usuario or not senha:
+            messagebox.showerror("Atenção", "Preencha usuario e senha.")
+            return
+        doc = self.usuarios.find_one({"usuario": usuario})
+        if not doc or doc.get("senha") != hash_senha(senha):
+            messagebox.showerror("Erro", "Usuario ou senha inválido.")
+            return
+        messagebox.showinfo("Sucesso", f"Bem vindo(a) {usuario}")
+        self.logado = True
+        self.janela.destroy()
+
+    def cadastrar(self):
+        usuario = self.ent_usuario.get().strip()
+        senha = self.ent_senha.get().strip()
+
+        if not usuario or not senha:
+            messagebox.showwarning("Atenção", "Preencha usuario e senha para cadastrar.")
+            return
+        if len(senha) < 4:
+            messagebox.showwarning("Atenação", "A senha deve ter pelo menos 4 caracteres")
+            return
+        if self.usuarios.find_one({"usuario": usuario}):
+            messagebox.showerror("Erro", "Usuario ja existe")
+            return
+        self.usuarios.insert_one({"usuario": usuario,
+                                  "senha": hash_senha(senha)})
+        messagebox.showinfo("Sucesso", "Usuario cadastrado com sucesso.")
+
+        
+    
+
+
